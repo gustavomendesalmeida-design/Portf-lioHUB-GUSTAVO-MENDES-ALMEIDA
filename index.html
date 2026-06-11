@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortfolioHUB - Meus Projetos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #24292e;
+            color: #fff;
+            width: 100%;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { margin: 0; font-size: 2.5rem; }
+        p { color: #aaa; margin-top: 0.5rem; }
+        .container {
+            max-width: 1000px;
+            width: 90%;
+            margin: 2rem 0;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e1e4e8;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #0366d6;
+        }
+        .card p {
+            color: #586069;
+            font-size: 0.9rem;
+            min-height: 40px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #2ea44f;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .btn:hover { background-color: #2c974b; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>PortfolioHUB de [Gustavo-Mendes-Almeida]</h1>
+        <p>Plataforma centralizada de projetos integrada ao GitHub</p>
+    </header>
+
+    <div class="container">
+        <h2>📂 Meus Repositórios Públicos</h2>
+        <div id="projetos-grid" class="grid">
+            <p style="color: #666;">Carregando projetos do GitHub...</p>
+        </div>
+    </div>
+
+    <script>
+        const usuarioGithub = "Gustavo-Mendes-Almeida";
+
+        async function carregarProjetos() {
+            const grid = document.getElementById('projetos-grid');
+            try {
+                const resposta = await fetch(`https://api.github.com/users/${usuarioGithub}/repos?sort=updated&per_page=6`);
+                if (!resposta.ok) throw new Error('Erro ao buscar dados');
+                
+                const repositorios = await resposta.ok ? await resposta.json() : [];
+                grid.innerHTML = '';
+
+                if(repositorios.length === 0) {
+                    grid.innerHTML = '<p>Nenhum repositório público encontrado.</p>';
+                    return;
+                }
+
+                repositorios.forEach(repo => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <h3>${repo.name}</h3>
+                        <p>${repo.description || 'Sem descrição cadastrada no GitHub.'}</p>
+                        <a href="${repo.html_url}" target="_blank" class="btn">Ver no GitHub</a>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (erro) {
+                grid.innerHTML = '<p style="color: red;">Não foi possível carregar os projetos
